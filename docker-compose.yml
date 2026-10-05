@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: flowai-postgres
+    environment:
+      POSTGRES_DB: flowai
+      POSTGRES_USER: flowai
+      POSTGRES_PASSWORD: flowai
+    ports:
+      - "5432:5432"
+    volumes:
+      - flowai_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flowai"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  flowai_pgdata:
