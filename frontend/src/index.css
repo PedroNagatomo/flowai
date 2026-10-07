@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-bg text-gray-100 antialiased;
+    font-family:
+      "Inter",
+      system-ui,
+      -apple-system,
+      sans-serif;
+  }
+  * {
+    @apply border-border;
+  }
+  ::selection {
+    @apply bg-accent/30;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-md
+           font-medium text-sm transition-colors disabled:opacity-50
+           disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-accent hover:bg-accentHover text-white;
+  }
+  .btn-secondary {
+    @apply btn bg-surfaceLight hover:bg-surface text-gray-200 border border-border;
+  }
+  .btn-ghost {
+    @apply btn text-gray-400 hover:text-gray-100 hover:bg-surfaceLight;
+  }
+  .btn-danger {
+    @apply btn bg-danger/10 text-danger hover:bg-danger/20 border border-danger/30;
+  }
+  .input {
+    @apply w-full px-3 py-2 bg-surface border border-border rounded-md
+           text-gray-100 placeholder-gray-500
+           focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent;
+  }
+  .label {
+    @apply block text-sm font-medium text-gray-300 mb-1.5;
+  }
+  .card {
+    @apply bg-surface border border-border rounded-lg p-6;
+  }
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium;
+  }
+  .badge-active {
+    @apply badge bg-success/10 text-success border border-success/30;
+  }
+  .badge-inactive {
+    @apply badge bg-gray-700/50 text-gray-400 border border-gray-700;
+  }
+}

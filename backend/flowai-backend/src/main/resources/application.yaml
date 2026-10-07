@@ -1,0 +1,72 @@
+spring:
+  application:
+    name: flowai-backend
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/flowai}
+    username: ${DB_USER:flowai}
+    password: ${DB_PASS:flowai}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: non_null
+
+server:
+  port: 8080
+  error:
+    include-message: always
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:flowai-dev-secret-key-change-in-production-minimum-256-bits-long-please}
+    expiration-ms: 31536000000
+  groq:
+    api-key: ${GROQ_API_KEY:}
+    model: openai/gpt-oss-120b
+    base-url: https://api.groq.com/openai/v1
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost:3000}
+
+logging:
+  level:
+    com.flowai: DEBUG
+    org.springframework.security: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
