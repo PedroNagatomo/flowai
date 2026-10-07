@@ -20,3 +20,7 @@ frontend/.vite/
 
 # OS
 .DS_Store
+
+.env.prod
+.env.production
+.env.*.local

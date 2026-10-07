@@ -12,19 +12,6 @@ import { PageLoader } from "../components/ui/Spinner";
 import type { WorkflowDefinition } from "../types";
 import { aiApi, type GeneratedWorkflow } from "../api/ai";
 
-const TRIGGER_OPTIONS = [
-  { value: "MANUAL", label: "Manual (botão)" },
-  { value: "WEBHOOK", label: "Webhook (POST)" },
-  { value: "SCHEDULE", label: "Agendado (cron)" },
-  { value: "EMAIL_RECEIVED", label: "Email recebido" },
-] as const;
-
-const ACTION_OPTIONS = [
-  { value: "SEND_EMAIL", label: "Enviar email" },
-  { value: "SEND_SLACK", label: "Enviar Slack" },
-  { value: "HTTP_REQUEST", label: "Requisição HTTP" },
-] as const;
-
 const DEFAULT_DEFINITION: WorkflowDefinition = {
   trigger: { type: "MANUAL", config: {} },
   actions: [{ type: "SEND_EMAIL", config: {} }],

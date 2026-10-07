@@ -1,0 +1,43 @@
+spring:
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+  flyway:
+    clean-disabled: true
+  mail:
+    host: ${MAIL_HOST:}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+logging:
+  level:
+    root: INFO
+    com.flowai: INFO
+    org.springframework.security: WARN
+    org.hibernate: WARN
+
+app:
+  cors:
+    allowed-origins: ${CORS_ORIGINS:}
+
+management:
+  endpoint:
+    health:
+      show-details: never
+  endpoints:
+    web:
+      exposure:
+        include: health
+    health:
+      mail:
+        enabled: false

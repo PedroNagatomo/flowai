@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.vite/
+.env.local
+.git/
+.gitignore
+*.md
+e2e/
+coverage/
