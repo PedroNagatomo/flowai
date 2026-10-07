@@ -10,13 +10,9 @@ import java.util.Map;
 import java.util.UUID;
 
 @Entity
-@Table(name = "workflows")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
-public class Workflow {
+@Table(name = "integrations")
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+public class Integration {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -25,19 +21,19 @@ public class Workflow {
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
+    @Column(nullable = false, length = 50)
+    private String type;
+
     @Column(nullable = false, length = 255)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
-
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(nullable = false, columnDefinition = "jsonb")
-    private Map<String, Object> definition;
+    private Map<String, Object> config;
 
     @Column(name = "is_active", nullable = false)
     @Builder.Default
-    private Boolean isActive = false;
+    private Boolean isActive = true;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -50,17 +46,8 @@ public class Workflow {
         var now = LocalDateTime.now();
         createdAt = now;
         updatedAt = now;
-        if (isActive == null) isActive = false;
     }
 
     @PreUpdate
-    void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
-
-    @Column(name = "last_run_at")
-    private LocalDateTime lastRunAt;
-
-    @Column(name = "next_run_at")
-    private LocalDateTime nextRunAt;
+    void onUpdate() { updatedAt = LocalDateTime.now(); }
 }

@@ -18,6 +18,7 @@ import java.util.UUID;
 public class WorkflowService {
 
     private final WorkflowRepository repo;
+    private final WorkflowSchedulerService schedulerService;
 
     @Transactional(readOnly = true)
     public List<WorkflowResponse> listByUser(UUID userId) {
@@ -40,7 +41,9 @@ public class WorkflowService {
                 .definition(req.definition())
                 .isActive(false)
                 .build();
-        return WorkflowResponse.from(repo.save(w));
+        w = repo.save(w);
+        // Não precisa reschedule no create, pois nasce inativo
+        return WorkflowResponse.from(w);
     }
 
     @Transactional
@@ -50,6 +53,10 @@ public class WorkflowService {
         if (req.description() != null) w.setDescription(req.description());
         if (req.definition() != null) w.setDefinition(req.definition());
         if (req.isActive() != null) w.setIsActive(req.isActive());
+
+        // Recalcula agendamento
+        schedulerService.reschedule(w);
+
         return WorkflowResponse.from(repo.save(w));
     }
 
@@ -63,4 +70,6 @@ public class WorkflowService {
         return repo.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new AccessDeniedException("Workflow não encontrado ou sem permissão"));
     }
+
+
 }

@@ -13,7 +13,9 @@ public record WorkflowResponse(
         Map<String, Object> definition,
         Boolean isActive,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        LocalDateTime lastRunAt,
+        LocalDateTime nextRunAt
 ) {
     public static WorkflowResponse from(Workflow w) {
         return new WorkflowResponse(
@@ -23,7 +25,9 @@ public record WorkflowResponse(
                 w.getDefinition(),
                 w.getIsActive(),
                 w.getCreatedAt(),
-                w.getUpdatedAt()
+                w.getUpdatedAt(),
+                w.getLastRunAt(),
+                w.getNextRunAt()
         );
     }
 }

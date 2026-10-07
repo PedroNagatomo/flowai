@@ -1,6 +1,7 @@
 package com.flowai.engine.actions;
 
 import com.flowai.engine.*;
+import com.flowai.repository.IntegrationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ public class SlackAction implements ActionExecutor {
 
     private final TemplateResolver resolver;
     private final RestClient.Builder restClientBuilder;
+    private final IntegrationRepository integrationRepo;
 
     @Override
     public ActionType supportedType() {
@@ -24,18 +26,33 @@ public class SlackAction implements ActionExecutor {
     @Override
     public ActionResult execute(ActionConfig cfg, ExecutionContext ctx) {
         var c = cfg.config();
-        String webhookUrl = (String) c.get("webhookUrl");
         String message = resolver.resolve((String) c.get("message"), ctx);
-        String channel = (String) c.get("channel"); // opcional, se webhook aceitar override
+        String channel = (String) c.get("channel");
 
-        // Fallback: usa variável de ambiente global
+        // 1. Tenta webhookUrl na config da ação
+        String webhookUrl = (String) c.get("webhookUrl");
+
+        // 2. Fallback: integração SLACK do usuário
+        if (webhookUrl == null || webhookUrl.isBlank()) {
+            var integration = integrationRepo
+                    .findFirstByUserIdAndTypeAndIsActiveTrue(ctx.workflow().getUserId(), "SLACK")
+                    .orElse(null);
+            if (integration != null) {
+                webhookUrl = (String) integration.getConfig().get("webhookUrl");
+                if (channel == null) {
+                    channel = (String) integration.getConfig().get("defaultChannel");
+                }
+            }
+        }
+
+        // 3. Fallback final: env var global
         if (webhookUrl == null || webhookUrl.isBlank()) {
             webhookUrl = System.getenv("SLACK_DEFAULT_WEBHOOK_URL");
         }
 
         if (webhookUrl == null || webhookUrl.isBlank()) {
             return ActionResult.failure(
-                    "webhookUrl do Slack não configurado (defina no config da ação ou SLACK_DEFAULT_WEBHOOK_URL)");
+                    "Slack webhook não configurado. Configure em Configurações → Integrações.");
         }
 
         try {
