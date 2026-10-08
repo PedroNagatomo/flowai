@@ -1,7 +1,11 @@
 package com.flowai.engine;
 
 public enum ActionType {
-    SEND_EMAIL, SEND_SLACK, HTTP_REQUEST;
+    SEND_EMAIL,
+    SEND_SLACK,
+    HTTP_REQUEST,
+    AI_PROMPT
+    ;
 
     public static ActionType from(String s) {
         try {

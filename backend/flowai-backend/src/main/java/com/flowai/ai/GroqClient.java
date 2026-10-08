@@ -43,14 +43,14 @@ public class GroqClient {
      * Força o modelo a retornar JSON válido via response_format.
      */
     public String completeJson(String systemPrompt, String userPrompt) {
-        var body = Map.of(
+        var body = java.util.Map.of(
                 "model", model,
-                "messages", List.of(
-                        Map.of("role", "system", "content", systemPrompt),
-                        Map.of("role", "user", "content", userPrompt)
+                "messages", java.util.List.of(
+                        java.util.Map.of("role", "system", "content", systemPrompt),
+                        java.util.Map.of("role", "user", "content", userPrompt)
                 ),
                 "temperature", 0.2,
-                "response_format", Map.of("type", "json_object")
+                "response_format", java.util.Map.of("type", "json_object")
         );
 
         try {
@@ -58,9 +58,19 @@ public class GroqClient {
                     .uri("/chat/completions")
                     .body(body)
                     .retrieve()
-                    .body(Map.class);
+                    .body(java.util.Map.class);
 
             return extractContent(response);
+        } catch (org.springframework.web.client.HttpClientErrorException e) {
+            String errorBody = e.getResponseBodyAsString();
+            log.error("❌ Groq retornou {}: {}", e.getStatusCode(), errorBody);
+            if (e.getStatusCode().value() == 401) {
+                throw new IllegalStateException("GROQ_API_KEY inválida ou expirada");
+            }
+            if (e.getStatusCode().value() == 429) {
+                throw new IllegalStateException("Rate limit da Groq atingido. Aguarde alguns minutos.");
+            }
+            throw new IllegalStateException("Falha ao consultar IA: " + e.getMessage(), e);
         } catch (Exception e) {
             log.error("❌ Erro ao chamar Groq", e);
             throw new IllegalStateException("Falha ao consultar IA: " + e.getMessage(), e);
@@ -75,5 +85,39 @@ public class GroqClient {
         }
         var message = (Map<String, Object>) choices.get(0).get("message");
         return (String) message.get("content");
+    }
+
+    public String completeText(String systemPrompt, String userPrompt) {
+        var body = java.util.Map.of(
+                "model", model,
+                "messages", java.util.List.of(
+                        java.util.Map.of("role", "system", "content", systemPrompt),
+                        java.util.Map.of("role", "user", "content", userPrompt)
+                ),
+                "temperature", 0.3
+        );
+
+        try {
+            var response = rest.post()
+                    .uri("/chat/completions")
+                    .body(body)
+                    .retrieve()
+                    .body(java.util.Map.class);
+
+            return extractContent(response);
+        } catch (org.springframework.web.client.HttpClientErrorException e) {
+            String errorBody = e.getResponseBodyAsString();
+            log.error("❌ Groq retornou {}: {}", e.getStatusCode(), errorBody);
+            if (e.getStatusCode().value() == 401) {
+                throw new IllegalStateException("GROQ_API_KEY inválida ou expirada");
+            }
+            if (e.getStatusCode().value() == 429) {
+                throw new IllegalStateException("Rate limit da Groq atingido. Aguarde alguns minutos.");
+            }
+            throw new IllegalStateException("Falha ao consultar IA: " + e.getMessage(), e);
+        } catch (Exception e) {
+            log.error("❌ Erro ao chamar Groq", e);
+            throw new IllegalStateException("Falha ao consultar IA: " + e.getMessage(), e);
+        }
     }
 }
